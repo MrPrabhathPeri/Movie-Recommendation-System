@@ -7,6 +7,7 @@ This project is a **content-based movie recommender system** built using Python 
 - **TMDB 5000 Movies Dataset**
 - **TMDB 5000 Credits Dataset**
 - Source: [Kaggle - TMDB Movie Dataset](https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata)
+- The data sets have not been uploaded here as they exceed the size capacity 
 
 ## 🚀 Features
 
