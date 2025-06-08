@@ -73,6 +73,3 @@ The Amazing Spider-Man 2
 - Use TF-IDF or advanced NLP techniques
 - Include IMDb ratings or user reviews for hybrid recommendations
 
-## 📄 License
-
-This project is open-source and free to use under the MIT License.
