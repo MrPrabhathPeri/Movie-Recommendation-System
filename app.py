@@ -1,6 +1,9 @@
 import pickle
 import streamlit as st
 import requests
+import time
+time.sleep(0.5)  # wait 500ms between calls
+
 st.markdown(
     """
     <style>
@@ -24,26 +27,53 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+@st.cache_data(show_spinner=False)
 def fetch_poster(movie_id):
-    url = "https://api.themoviedb.org/3/movie/{}?api_key=8265bd1679663a7ea12ac168da84d2e8&language=en-US".format(movie_id)
-    data = requests.get(url)
-    data = data.json()
-    poster_path = data['poster_path']
-    full_path = "https://image.tmdb.org/t/p/w500/" + poster_path
-    return full_path
+    for attempt in range(6):  # Retry up to 3 times
+        try:
+            url = (
+                f"https://api.themoviedb.org/3/movie/{movie_id}"
+                f"?api_key=a1f2ea95cdcfd24bbf351c2d16af2cfa"
+                f"&language=en-US&append_to_response=images"
+                f"&include_image_language=en,null"
+            )
+            response = requests.get(url, timeout=3)
+            response.raise_for_status()
+            data = response.json()
+
+            poster_path = data.get('poster_path')
+            if poster_path:
+                return f"https://image.tmdb.org/t/p/w500{poster_path}"
+            else:
+                return "https://via.placeholder.com/300x450?text=No+Poster"
+
+        except requests.exceptions.RequestException as e:
+            print(f"[Attempt {attempt + 1}] Failed to fetch poster for ID {movie_id}: {e}")
+            time.sleep(0.3)  # brief pause before retry
+
+    # Final fallback after retries
+    return "https://via.placeholder.com/300x450?text=Error"
+
+
+
+
+
+from concurrent.futures import ThreadPoolExecutor
 
 def recommend(movie):
     index = movies[movies['title'] == movie].index[0]
     distances = sorted(list(enumerate(similarity[index])), reverse=True, key=lambda x: x[1])
-    recommended_movie_names = []
-    recommended_movie_posters = []
-    for i in distances[1:11]:
-        # fetch the movie poster
-        movie_id = movies.iloc[i[0]].movie_id
-        recommended_movie_posters.append(fetch_poster(movie_id))
-        recommended_movie_names.append(movies.iloc[i[0]].title)
+    
+    recommended_movie_names = [movies.iloc[i[0]].title for i in distances[1:11]]
+    movie_ids = [movies.iloc[i[0]].movie_id for i in distances[1:11]]
 
-    return recommended_movie_names,recommended_movie_posters
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        recommended_movie_posters = list(executor.map(fetch_poster, movie_ids))
+
+    return recommended_movie_names, recommended_movie_posters
+
+
+
 
 
 st.header('Movie Recommender System')
@@ -71,6 +101,5 @@ if st.button('Show Recommendation'):
         with cols_row2[i - 5]:
             st.text(recommended_movie_names[i])
             st.image(recommended_movie_posters[i])
-
 
 
