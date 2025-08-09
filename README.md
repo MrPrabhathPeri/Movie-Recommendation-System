@@ -74,7 +74,8 @@ The Amazing Spider-Man 2
    - `similarity.pkl`
 
    *(These files are generated from `tmdb_5000_movies.csv` and `tmdb_5000_credits.csv` during preprocessing.)*
-5. Run the Streamlit app:
+5. Find your API key from tmdb website and enter it in the app.py file 
+6. Run the Streamlit app:
    ```bash
    streamlit run app.py
    ```
