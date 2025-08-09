@@ -33,7 +33,7 @@ def fetch_poster(movie_id):
         try:
             url = (
                 f"https://api.themoviedb.org/3/movie/{movie_id}"
-                f"?api_key=a1f2ea95cdcfd24bbf351c2d16af2cfa"
+                f"?api_key=<<enter_your_api_key>>"      #Enter you API key for TMDB website
                 f"&language=en-US&append_to_response=images"
                 f"&include_image_language=en,null"
             )
@@ -101,5 +101,6 @@ if st.button('Show Recommendation'):
         with cols_row2[i - 5]:
             st.text(recommended_movie_names[i])
             st.image(recommended_movie_posters[i])
+
 
 
